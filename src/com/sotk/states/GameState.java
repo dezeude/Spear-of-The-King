@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
+import javax.swing.JFrame;
+
 import com.sotk.entities.Player;
 import com.sotk.levels.*;
 import com.sotk.main.GamePanel;
@@ -15,7 +17,7 @@ public class GameState extends State{
 	GamePanel game;
 	Level curLevel;
 	int level = 1;
-	
+
 	public GameState(GamePanel game){
 		this.game = game;
 		init();
@@ -54,13 +56,12 @@ public class GameState extends State{
 		if(key == KeyEvent.VK_SPACE)
 			curLevel.interact();
 		if(key == KeyEvent.VK_S)
-//			Launcher.actualFullScreen();
-			Launcher.fullScreen();
+			Launcher.frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	}
 
 	@Override
-	public void mousePressed(int mouseBtn) {
-		curLevel.mousePressed(mouseBtn);
+	public void mousePressed(int mouseBtn, int x, int y) {
+		curLevel.mousePressed(mouseBtn, x, y);
 	}
 
 	@Override

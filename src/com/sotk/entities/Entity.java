@@ -1,11 +1,12 @@
 package com.sotk.entities;
 
+import org.joml.Vector2i;
+
 public abstract class Entity {
-	protected int bx, by;
+	protected Vector2i position = new Vector2i();
 	public abstract void update();
 	public abstract void render(java.awt.Graphics g);
-	public abstract void interact();
-	public abstract int getX();
-	public abstract int getY();
+	public int getX() {return position.x;}
+	public int getY() {return position.y;}
 	public abstract void addExtras(String[] extras);
 }

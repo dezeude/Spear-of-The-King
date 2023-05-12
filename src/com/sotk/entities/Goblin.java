@@ -16,7 +16,7 @@ public class Goblin extends Creature {
 	//position offsets
 	private int xOff = 64, yOff = 64; //placeholder values
 	//render bounds
-	private int renderWidth = 150, renderHeight = 150;
+//	private int renderWidth = 150, renderHeight = 150;
 	//sprite sheet
 	private static BufferedImage sheet;
 	//animations
@@ -29,11 +29,11 @@ public class Goblin extends Creature {
 	BufferedImage curFrame;
 	Level level;
 	
-	private static Goblin firstGoblin;
+//	private static Goblin firstGoblin;
 			
 	public Goblin(int x, int y, Level level) {
-		bx = x;
-		by = y;
+		position.x = x;
+		position.y = y;
 		bw = 22;
 		bh = 36;
 		health = 3;
@@ -43,30 +43,30 @@ public class Goblin extends Creature {
 		loadAnimations();
 	}
 	
-	public Goblin newGoblin(int x, int y, Level level) {
-//*******************************************
-//APPLY THIS TECHNIQUE TO ALL THE ENEMIES
-
-		bx = x;
-		by = y;
-		bw = 22;
-		bh = 36;
-		this.level = level;
-//		if(sheet == null)
-//			sheet = AssetsManager.loadImage("/mobs/enemies/goblin/goblinSprite.png");
-		
-		if(firstGoblin == null) { //if this is the first instance of the goblin
-			firstGoblin = this;
-			loadAnimations();
-			return this;
-		}
-		//if not, share the image frames, to save memory
-		idle = new Animation(firstGoblin.idle);
-		run = new Animation(firstGoblin.run);
-		return this;
-		
-	}
-	
+//	public Goblin newGoblin(int x, int y, Level level) {
+////*******************************************
+////APPLY THIS TECHNIQUE TO ALL THE ENEMIES
+//
+//		position.x = x;
+//		position.y = y;
+//		bw = 22;
+//		bh = 36;
+//		this.level = level;
+////		if(sheet == null)
+////			sheet = AssetsManager.loadImage("/mobs/enemies/goblin/goblinSprite.png");
+//		
+//		if(firstGoblin == null) { //if this is the first instance of the goblin
+//			firstGoblin = this;
+//			loadAnimations();
+//			return this;
+//		}
+//		//if not, share the image frames, to save memory
+//		idle = new Animation(firstGoblin.idle);
+//		run = new Animation(firstGoblin.run);
+//		return this;
+//		
+//	}
+//	
 	private void loadAnimations() {
 		idle = new Animation(sheet, 0, 150, 150, 4, 0.1f);
 		run = new Animation(sheet, 1, 150, 150, 8, 0.2f);
@@ -81,19 +81,19 @@ public class Goblin extends Creature {
 	@Override
 	public void update() {
 		if(alive){
-			velx = 0;
+			velocity.x = 0;
 			if(level.isPlayerAlive() && level.distFromPlayer(getBounds()) <= 250) {//if the player is alive
 				//moving towards the player
-				if(level.getPlayerBounds().x > this.bx + this.bw) { 
+				if(level.getPlayerBounds().x > this.position.x + this.bw) { 
 					//the player is on the right
-					velx = 2;
+					velocity.x = 2;
 					if(!inAnimation)
 						facingRight = true;
 				}
 					
-				else if(level.getPlayerBounds().x + level.getPlayerBounds().width < this.bx) {
+				else if(level.getPlayerBounds().x + level.getPlayerBounds().width < this.position.x) {
 					//the player is on the left
-					velx = -2;
+					velocity.x = -2;
 					if(!inAnimation)
 						facingRight = false;
 				}
@@ -109,19 +109,19 @@ public class Goblin extends Creature {
 				
 			
 			if(!bottom)
-				vely += gravity;
+				velocity.y += 0.45f;
 			else
-				vely = 1;
+				velocity.y = 1;
 			
 			if(invincible || attacking)
-				velx = 0;
+				velocity.x = 0;
 			
 			top = false;
 			bottom = false;
 			left = false;
 			right = false;
 			
-			move((int)velx,(int)vely);
+			move((int)velocity.x,(int)velocity.y);
 			
 			
 			 //if the goblin is alive
@@ -148,7 +148,7 @@ public class Goblin extends Creature {
 						
 			}
 			else {
-				if(velx == 0) {
+				if(velocity.x == 0) {
 					curAnim = idle;
 				}
 				else {
@@ -167,8 +167,8 @@ public class Goblin extends Creature {
 			
 			if(curAnim.isAttackFrame()) { //if the attack frame exists
 				Rectangle curAttackFrame = curAnim.getAttackFrame();
-				Rectangle newB = new Rectangle(bx - xOff + curAttackFrame.x,
-											   by - yOff + curAttackFrame.y,
+				Rectangle newB = new Rectangle(position.x - xOff + curAttackFrame.x,
+											   position.y - yOff + curAttackFrame.y,
 											   curAttackFrame.width,
 											   curAttackFrame.height);
 //				System.out.println(curAttackFrame);
@@ -182,8 +182,8 @@ public class Goblin extends Creature {
 			
 			if(curAnim.isAttackFrame()) { //if the attack frame exists
 				Rectangle curAttackFrame = curAnim.getAttackFrame();
-				Rectangle newB = new Rectangle(bx - xOff + curAttackFrame.x - bw - curAttackFrame.width,
-											   by - yOff + curAttackFrame.y,
+				Rectangle newB = new Rectangle(position.x - xOff + curAttackFrame.x - bw - curAttackFrame.width,
+											   position.y - yOff + curAttackFrame.y,
 											   curAttackFrame.width,
 											   curAttackFrame.height);
 //				System.out.println(curAttackFrame);
@@ -197,7 +197,7 @@ public class Goblin extends Creature {
 	@Override
 	public void render(Graphics g) {
 		
-		g.drawImage(curFrame, bx - xOff - Camera.getXOffset(), by - yOff - Camera.getYOffset(), renderWidth, renderHeight, null);
+		g.drawImage(curFrame, position.x - xOff - Camera.getXOffset(), position.y - yOff - Camera.getYOffset(), curFrame.getWidth(), curFrame.getHeight(), null);
 
 		
 		//draw line from middle of goblin to middle of player
@@ -221,7 +221,7 @@ public class Goblin extends Creature {
 	@Override
 	public Rectangle getBounds() {
 		// TODO Auto-generated method stub
-		return new Rectangle(bx,by,bw,bh);
+		return new Rectangle(position.x,position.y,bw,bh);
 	}
 
 	@Override
@@ -235,12 +235,6 @@ public class Goblin extends Creature {
 		attacking = false;
 		attack.reset();
 //		level.setDialogue("I died");
-	}
-
-	@Override
-	public void interact() {
-		// TODO Auto-generated method stub
-		
 	}
 
 

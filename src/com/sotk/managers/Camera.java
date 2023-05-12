@@ -17,12 +17,12 @@ public class Camera {
 //(the player) slower the higher it is.
 		divisor = div;
 	}
-	public static void smoothTo(int x, int y) {
+	public static void smoothTo(int x, int y) {//TODO: FIX THIS!
 // Smoothly moves the camera to the argument position (x,y) by changing the x and y 
 // offsets by the difference of the position and dividing it by the smoothing divisor number.
 
-		xOffset += (x - xOffset - (GamePanel.getWindowWidth() / 2)) / divisor;
-		yOffset += (y - yOffset - (GamePanel.getWindowHeight() * 0.7)) / divisor;
+		xOffset += (x - xOffset - (GamePanel.getGraphicsWidth() / 2))	/ divisor;
+		yOffset += (y - yOffset - (GamePanel.getGraphicsHeight() * 0.7))	/ divisor;
 		
 		//Makes the argument position eventually appear at the middle of the screen width,
 		//and 7/10 of the screen height.

@@ -1,68 +1,42 @@
 package com.sotk.main;
 
 import java.awt.Dimension;
-import java.io.File;
-import java.io.IOException;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 import com.sotk.managers.AssetsManager;
 import com.sotk.managers.TileMap;
 
-import java.awt.*;
-
 public class Launcher {
 	
-	private static JFrame frame;
+	public static JFrame frame;
 	
 	public static void main(String[] args) {
-//		System.out.println(TileMap.class.getResource("/").getPath());
-//		String classpath = System.getProperty("java.class.path");
-//        String[] classPathValues = classpath.split(File.pathSeparator);
-//        for (String classPath: classPathValues) {
-//            System.out.println(classPath);
-//        }
-		
-		
-		int width = 32 * 23;//32 is the TileLength
-		int height = 32 * 13;
-		GamePanel gp = new GamePanel(width,height);
+		Image icon = AssetsManager.loadImage("/Spear.png");
 		frame = new JFrame("Spear of the King");
-		frame.requestFocusInWindow();
-		 //add JFrame component to frame
+		frame.setIconImage(icon);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
-		frame.setResizable(false);
-//		frame.pack();
-//		frame.setUndecorated(true);
+		frame.setResizable(true);
 		
-		frame.setVisible(true);
-		frame.setSize(width, height);
-		frame.setLocationRelativeTo(null);
+		GamePanel gp = new GamePanel();
 		frame.setContentPane(gp);
-		frame.addKeyListener(gp);
-		frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-	}
-	
-	public static void changeSize(int width, int height) {
-		frame.setSize(width,height);
+		frame.addKeyListener(gp);		
+		frame.setLayout(null);
+		frame.pack();
 		frame.setLocationRelativeTo(null);
-	}
-	
-	public static void fullScreen() {
-	    frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-	}
-	
-	public static void actualFullScreen() {
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		GraphicsDevice gd = ge.getDefaultScreenDevice();
-		gd.setFullScreenWindow(frame);
+		frame.setVisible(true);
 	}
 	
 

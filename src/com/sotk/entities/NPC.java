@@ -7,6 +7,9 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import org.joml.Vector2f;
+import org.joml.Vector2i;
+
 import com.sotk.levels.Level;
 import com.sotk.main.GamePanel;
 import com.sotk.managers.Animation;
@@ -14,7 +17,7 @@ import com.sotk.managers.AssetsManager;
 import com.sotk.managers.Camera;
 import com.sotk.managers.TileMap;
 
-public abstract class NPC extends Entity{
+public abstract class NPC extends Entity implements Interactable{
 	protected boolean top = false, bottom = false, left = false, right = false;
 	protected int bw, bh, health;
 	private int TILELENGTH = TileMap.TILELENGTH;
@@ -40,10 +43,10 @@ public abstract class NPC extends Entity{
 	protected int selectX, selectY;
 //arrow select image that hovers above the selected NPC with speech.
 	
-	static int dialogueWidth = (int)(GamePanel.getWindowWidth() * 0.5);
-	static int dialogueHeight = (int)(GamePanel.getWindowHeight() * 0.35);
-	static int dialogueX = (int)(GamePanel.getWindowWidth() / 2) - dialogueWidth / 2;
-	static int dialogueY = (int)(GamePanel.getWindowHeight() * 0.025);
+	static int dialogueWidth = (int)(GamePanel.getGraphicsWidth() * 0.5);
+	static int dialogueHeight = (int)(GamePanel.getGraphicsHeight() * 0.35);
+	static int dialogueX = (int)(GamePanel.getGraphicsWidth() / 2) - dialogueWidth / 2;
+	static int dialogueY = (int)(GamePanel.getGraphicsHeight() * 0.025);
 	static int dialogueArc = 50;
 	static int dialogueOffset = 30;
 	static float tick = 0;
@@ -57,8 +60,8 @@ public abstract class NPC extends Entity{
 	protected boolean dialogueVisible = false;
 	
 	public NPC(int x, int y, Level level) {
-		bx = x;
-		by = y;
+		position.x = x;
+		position.y = y;
 		this.level = level;
 		speechIndex = -1;
 		selectImage = AssetsManager.loadImage("/worlds/Assets/arrow.png");
@@ -85,22 +88,22 @@ public abstract class NPC extends Entity{
 	@Override
 	public void render(Graphics g) {
 		if(facingRight)
-			g.drawImage(curAnim.getCurFrame(), bx - xOff - Camera.getXOffset(), by - yOff - Camera.getYOffset(), renderWidth, renderHeight, null);
+			g.drawImage(curAnim.getCurFrame(), position.x - xOff - Camera.getXOffset(), position.y - yOff - Camera.getYOffset(), renderWidth, renderHeight, null);
 		else
-			g.drawImage(curAnim.getMirrorFrame(), bx - xOff - Camera.getXOffset(), by - yOff - Camera.getYOffset(), renderWidth, renderHeight, null);
+			g.drawImage(curAnim.getMirrorFrame(), position.x - xOff - Camera.getXOffset(), position.y - yOff - Camera.getYOffset(), renderWidth, renderHeight, null);
 		
 		if(speechReady) {
 			//draw the selectImage
-			selectX = ((bx * 2 + bw) / 2) - 24 - Camera.getXOffset();
-			selectY = by - bh - Camera.getYOffset();
+			selectX =  (((position.x * 2 + bw) / 2) - 24 - Camera.getXOffset());
+			selectY =  (position.y - bh - Camera.getYOffset());
 			yOffset = Math.sin(tick);
 			tick += 0.05f;
 			g.drawImage(selectImage, selectX,(int)(yOffset * 10) - 4 + selectY, null);
 		}
 		
 		if(dialogueVisible) {
-			dialogueX = (int)(GamePanel.getWindowWidth() / 2) - dialogueWidth / 2;
-			dialogueY = (int)(GamePanel.getWindowHeight() * 0.025);
+			dialogueX = (int)(GamePanel.getGraphicsWidth() / 2) - dialogueWidth / 2;
+			dialogueY = (int)(GamePanel.getGraphicsHeight() * 0.025);
 			
 			g.setColor(dialogueColor);
 			g.fillRoundRect(dialogueX,
@@ -125,17 +128,20 @@ public abstract class NPC extends Entity{
 	@Override
 	public int getX() {
 		// TODO Auto-generated method stub
-		return bx;
+		return position.x;
 	}
 
 	@Override
 	public int getY() {
 		// TODO Auto-generated method stub
-		return by;
+		return position.y;
 	}
 	
+	public Vector2i getPos() {return position;}
+	
 	public void move(int vx, int vy) {
-		
+		int bx = position.x;
+		int by = position.y;
 		//get all the possible tiles in a list
 		ArrayList<Rectangle> hitList = new ArrayList();
 		for(int i = by / TILELENGTH - 2; i < (by + bh) / TILELENGTH + 2; i++) {
@@ -187,7 +193,7 @@ public abstract class NPC extends Entity{
 	}
 	
 	public Rectangle getBounds() {
-		return new Rectangle(bx,by,bw,bh);
+		return new Rectangle(position.x,position.y,bw,bh);
 	}
 	
 	public void setSpeech(String[] speech) {
@@ -208,7 +214,8 @@ public abstract class NPC extends Entity{
 	
 	public void interact() {
 		// TODO Auto-generated method stub
-		speak();
+		if(level.distFromPlayer(getBounds()) <= speechRange)
+			speak();
 	}
 	
 	@Override

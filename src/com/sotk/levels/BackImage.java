@@ -13,7 +13,7 @@ public class BackImage {
 	
 	public BackImage(String path, float speed) {
 		this.x = 0;
-		this.x2 = GamePanel.getWindowWidth();
+		this.x2 = GamePanel.getGraphicsWidth();
 		this.game = game;
 		this.speed = speed;
 		img = AssetsManager.loadImage(path);
@@ -21,7 +21,7 @@ public class BackImage {
 	
 	public BackImage(String path, float speed, int xOff, int yOff, int widthOff, int heightOff) {
 		this.x = 0;
-		this.x2 = GamePanel.getWindowWidth();
+		this.x2 = GamePanel.getGraphicsWidth();
 		this.game = game;
 		this.speed = speed;
 		img = AssetsManager.loadImage(path);
@@ -34,27 +34,27 @@ public class BackImage {
 	
 	public void moveLeft() {//moves the background to the right, but gives the feeling of the scene moving left.
 		if((int)x == 0) 
-			x2 = -GamePanel.getWindowWidth();
+			x2 = -GamePanel.getGraphicsWidth();
 		if((int)x2 == 0)
-			x = -GamePanel.getWindowWidth();
+			x = -GamePanel.getGraphicsWidth();
 		x += speed;
 		x2 += speed;
 	}
 	
 	public void moveRight() { //moves the background to the left, but gives the feeling of the scene moving right.
 		if((int)x == 0)
-			x2 = GamePanel.getWindowWidth();
+			x2 = GamePanel.getGraphicsWidth();
 		if((int)x2 == 0)
-			x = GamePanel.getWindowWidth();
+			x = GamePanel.getGraphicsWidth();
 		x -= speed;
 		x2 -= speed;
 	}
 	
 	public void render(Graphics g) {
 		//first image
-		g.drawImage(img, (int)x, -GamePanel.getWindowHeight() / 4, GamePanel.getWindowWidth() + 1, GamePanel.getWindowHeight(), null); 
+		g.drawImage(img, (int)x, -GamePanel.getGraphicsHeight() / 4, GamePanel.getGraphicsWidth() + 1, GamePanel.getGraphicsHeight(), null); 
 		//+1 width to fix background gap
 		//second image
-		g.drawImage(img, (int)x2, -GamePanel.getWindowHeight() / 4, GamePanel.getWindowWidth(), GamePanel.getWindowHeight(), null);
+		g.drawImage(img, (int)x2, -GamePanel.getGraphicsHeight() / 4, GamePanel.getGraphicsWidth(), GamePanel.getGraphicsHeight(), null);
 	}
 }

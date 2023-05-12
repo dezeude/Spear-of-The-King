@@ -7,6 +7,9 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+import org.joml.Vector2f;
+import org.joml.Vector2i;
+
 import com.sotk.levels.Level;
 import com.sotk.main.GamePanel;
 import com.sotk.main.Launcher;
@@ -15,12 +18,15 @@ import com.sotk.managers.Camera;
 import com.sotk.managers.KeyManager;
 
 public class Player extends Creature {
-	private int renderWidth = 150, renderHeight = 150;
+//	private int renderWidth = 150, renderHeight = 150;
 	private int xOff = 64,yOff = 57; //bounds x and y offsets, with the width and height 
 	private float maxSpeed = 5.0f;
 	private int timeSinceJumped = 0;
 	private boolean isJumping = false;
-	
+	private final float knockBack = 5.0f;
+	private int renderDimensions = 150;
+	private int mouseX = 0;
+	private int mouseY = 0;
 
 	KeyManager keyManager;
 	
@@ -46,8 +52,7 @@ public class Player extends Creature {
 	
 	public Player(int x, int y, Level level) {
 		//make the width and height of the gamePanel static
-		this.bx = x;
-		this.by = y;
+		velocity = new Vector2f(x,y);
 		bw = 20;
 		bh = 40;
 		health = 3;
@@ -88,14 +93,14 @@ public class Player extends Creature {
 	
 	
 	public void processInput() { 
-//		velx = 0;
+		velocity.x = 0;
 		if(keyManager.getKey(KeyEvent.VK_A)) {
 			if(!inAnimation || attacking) {
 				if(!attacking)
 					facingRight = false;
-				velx += -5;
-				if(velx < maxSpeed)
-					velx = -maxSpeed;
+				velocity.x += -5;
+				if(velocity.x < maxSpeed)
+					velocity.x = -maxSpeed;
 			}
 			
 		}
@@ -104,9 +109,9 @@ public class Player extends Creature {
 			if(!inAnimation || attacking) {
 				if(!attacking)
 					facingRight = true;
-				velx += 5;
-				if(velx > maxSpeed)
-					velx = maxSpeed;
+				velocity.x += 5;
+				if(velocity.x > maxSpeed)
+					velocity.x = maxSpeed;
 			}
 			
 		}
@@ -116,14 +121,14 @@ public class Player extends Creature {
 			if(!invincible) {
 				if(bottom) { //if there is a tile under the player
 					timeSinceJumped = 0;
-					vely = -9;
+					velocity.y = -9;
 					bottom = false;
 					isJumping = true;
 				}
 				else { //if the player is in the air
 					timeSinceJumped++;
 					if(timeSinceJumped <= 20 && isJumping) {
-						vely -= 0.3;
+						velocity.y -= 0.3;
 					}
 					else {
 						timeSinceJumped = 0;
@@ -141,24 +146,24 @@ public class Player extends Creature {
 		
 		if(bottom) {//if the player is standing on a tile
 			//change the y velocity so the player falls slower
-			vely = 1;
+			velocity.y = 1;
 		}
 		else {//if player is falling
 			
-			vely += gravity;
+			velocity.y += 0.45f;
 			//apply gravity
 		}
-		if(velx > 0) { //player moving right
-			if(velx <= 1)
-				velx = 0;
+		if(velocity.x > 0) { //player moving right
+			if(velocity.x <= 1)
+				velocity.x = 0;
 			else
-			velx--;
+			velocity.x--;
 		} 
-		if(velx < 0) { //player moving left
-			if(velx >= -1)
-				velx = 0;
+		if(velocity.x < 0) { //player moving left
+			if(velocity.x >= -1)
+				velocity.x = 0;
 			else
-			velx++;
+			velocity.x++;
 		}
 		
 		top = false;
@@ -166,7 +171,12 @@ public class Player extends Creature {
 		left = false;
 		right = false;
 		
-		move((int)velx,(int)vely); //move the player and check for collisions
+		force.div(mass);
+		velocity.add(force);	
+//		velocity.mul(dt);	
+		force.zero();
+		
+		move((int)velocity.x,(int)velocity.y); //move the player and check for collisions
 		
 	}	
 	
@@ -175,8 +185,8 @@ public class Player extends Creature {
 		if(alive) {
 			
 		processInput();
-		Camera.smoothTo(bx+bw/2,by-bh/2);//center player in the middle of the screen.
-		
+		Camera.smoothTo(position.x+bw/2,position.y+bh/2);//center player in the middle of the screen.
+		//TODO: Fix SmoothTo
 		if(inAnimation) {
 			if(invincible) {
 				curAnim = takeHit;
@@ -201,7 +211,7 @@ public class Player extends Creature {
 		}
 		else {
 			if(bottom) { //if the player is on a tile/on the ground
-				if(velx == 0) {
+				if(velocity.x == 0) {
 					curAnim = idle;
 				}
 				else {
@@ -209,7 +219,7 @@ public class Player extends Creature {
 				}
 			}
 			else {
-				if(vely < 0) { //player is ascending
+				if(velocity.y < 0) { //player is ascending
 					curAnim = jump;
 				}
 				else {
@@ -233,8 +243,8 @@ public class Player extends Creature {
 			
 			if(curAnim.isAttackFrame()) { //if the attack frame exists
 				Rectangle curAttackFrame = curAnim.getAttackFrame();
-				Rectangle newB = new Rectangle(bx - xOff + curAttackFrame.x,
-											   by - yOff + curAttackFrame.y,
+				Rectangle newB = new Rectangle(position.x - xOff + curAttackFrame.x,
+											   position.y - yOff + curAttackFrame.y,
 											   curAttackFrame.width,
 											   curAttackFrame.height);
 //				System.out.println(curAttackFrame);
@@ -246,8 +256,8 @@ public class Player extends Creature {
 			
 			if(curAnim.isAttackFrame()) { //if the attack frame exists
 				Rectangle curAttackFrame = curAnim.getAttackFrame();
-				Rectangle newB = new Rectangle(bx - xOff + curAttackFrame.x - bw - curAttackFrame.width,
-											   by - yOff + curAttackFrame.y,
+				Rectangle newB = new Rectangle(position.x - xOff + curAttackFrame.x - bw - curAttackFrame.width,
+											   position.y - yOff + curAttackFrame.y,
 											   curAttackFrame.width,
 											   curAttackFrame.height);
 //				System.out.println(curAttackFrame);
@@ -262,9 +272,19 @@ public class Player extends Creature {
 	
 	@Override
 	public void render(Graphics g) {
-		
+//		g.fillRect(position.x - xOff - Camera.getXOffset(),
+//				   position.y - yOff - Camera.getYOffset(),
+//				   renderDimensions,
+//				   renderDimensions);
 		//draw the player
-		g.drawImage(curFrame, bx - xOff - Camera.getXOffset(), by - yOff - Camera.getYOffset(), renderWidth, renderHeight, null);
+		g.drawImage(curFrame,
+					position.x - xOff - Camera.getXOffset(),
+					position.y - yOff - Camera.getYOffset(),
+					renderDimensions,
+					renderDimensions,
+					null);
+//		g.drawLine(position.x + bw/2 - Camera.getXOffset(), position.y+bh/2 - Camera.getYOffset(), mouseX, mouseY);
+		
 	}
 	
 	public void resetAnims() {
@@ -274,12 +294,12 @@ public class Player extends Creature {
 	}
 	
 	public Rectangle getBounds() {
-		return new Rectangle(bx,by,bw,bh);
+		return new Rectangle(position.x,position.y,bw,bh);
 	}
 	
 	public double getDist(Rectangle other) {
-		return Point2D.distance(bx + bw/2,
-								by + bh/2,
+		return Point2D.distance(position.x + bw/2,
+								position.y + bh/2,
 								other.x + other.width/2,
 								other.y + other.height/2);
 	}
@@ -300,25 +320,11 @@ public class Player extends Creature {
 	}
 	
 	public float getVelX() {
-		return velx;
+		return velocity.x;
 	}
 	
 	public float getVelY() {
-		return vely;
-	}
-
-
-	@Override
-	public int getX() {
-		// TODO Auto-generated method stub
-		return bx;
-	}
-
-
-	@Override
-	public int getY() {
-		// TODO Auto-generated method stub
-		return by;
+		return velocity.y;
 	}
 
 
@@ -335,16 +341,42 @@ public class Player extends Creature {
 		invincible = true;
 		inAnimation = true;
 		attack2.reset();
+		health = 3;
 	}
 	
 	public boolean isAlive() {
 		return alive;
 	}
 
-	@Override
-	public void interact() {
-		// TODO Auto-generated method stub
-		//Do Nothing. Can't Interact with player.
+	public void addForce(Vector2f force) {
+		force.normalize(force);
+		force.mul(knockBack, force);
+		this.force.add(force);
+		force.zero();
+	}
+	
+	public void addForce(Vector2i force) {
+		addForce(new Vector2f((float)force.x, (float)force.y));
+	}
+
+	public void throwSpear(int x, int y) {
+		mouseX = x;
+		mouseY = y;
+
+//		System.out.println("pX: " + position.x + " pY: " + position.y);
+		Vector2f dir = new Vector2f((mouseX + Camera.getXOffset()) - (position.x + bw/2),
+									(mouseY + Camera.getYOffset()) - (position.y + bh/2)).normalize(maxSpeed * 3);
+//		System.out.println("DirX: " + dir.x() + " DirY: " + dir.y());
+		Vector2i newPos = centerPos();
+		level.addProjectile(new Spear(newPos, dir));
+	}
+	
+	public void throwSpear(Vector2i point) {
+		throwSpear(point.x, point.y);
+	}
+	
+	public Vector2i centerPos() {
+		return new Vector2i(position.x + bw/2, position.y + bh/2);
 	}
 
 

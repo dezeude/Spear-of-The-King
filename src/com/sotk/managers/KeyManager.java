@@ -20,11 +20,21 @@ public class KeyManager {
 	}
 	
 	public void keyPressed(int key) {
-		keys[key] = true;
+		try {
+			keys[key] = true;
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
 }
 	
 	public void keyReleased(int key) {
-		keys[key] = false;
+		try { //in case of special inputs that exceed the array.
+			keys[key] = false;
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+		
 	}
 	
 	

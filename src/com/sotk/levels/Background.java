@@ -44,7 +44,7 @@ public class Background {
 	public void render(Graphics g) {
 		//background color
 		g.setColor(backgroundColor);
-		g.fillRect(0, 0, GamePanel.getWindowWidth(), GamePanel.getWindowHeight());
+		g.fillRect(0, 0, GamePanel.getGraphicsWidth(), GamePanel.getGraphicsHeight());
 		for(BackImage b: layers)
 			b.render(g);
 	

@@ -6,12 +6,17 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import org.joml.Vector2f;
+import org.joml.Vector2i;
+
 import com.sotk.entities.Creature;
 import com.sotk.entities.Entity;
 import com.sotk.entities.Goblin;
+import com.sotk.entities.Interactable;
 import com.sotk.entities.King;
 import com.sotk.entities.NPC;
 import com.sotk.entities.Player;
+import com.sotk.entities.Projectile;
 import com.sotk.main.GamePanel;
 import com.sotk.managers.Camera;
 import com.sotk.managers.Collisions;
@@ -31,9 +36,12 @@ public class Level {
 	
 	ArrayList<Creature> enemies;
 	ArrayList<NPC> npcs;
+	ArrayList<Projectile> projs;
 //	ArrayList<Projectiles> projectiles;
 	
-	Entity selectedEntity;
+	public Vector2f gravity = new Vector2f(0, .981f / 2);
+	
+	Interactable selectedEntity;
 	
 	
 	public Level(String path, GameState gState, GamePanel game) {
@@ -44,6 +52,7 @@ public class Level {
 	}
 	
 	public void init() {
+		projs = new ArrayList<>();
 		enemies = new ArrayList<>();
 		npcs  = new ArrayList<>();
 		tileMap = new TileMap(path, this);
@@ -98,6 +107,18 @@ public class Level {
 			npc.update();
 		
 		
+		for(Projectile proj: projs) {
+			
+			Vector2f temp = new Vector2f();
+			gravity.mul(proj.getMass(), temp);
+			proj.applyForce(temp);
+			proj.update();
+//			System.out.println("Update Projs!");
+		}
+		
+//		projs.forEach((n) -> n.update());
+		
+		
 //		checkCollisions();
 //		System.out.println(enemies.size());
 	}
@@ -110,6 +131,8 @@ public class Level {
 			e.render(g);
 		for(NPC npc: npcs)
 			npc.render(g);
+		for(Projectile proj: projs)
+			proj.render(g);
 		
 //		draw the attackBounds
 //		Rectangle b = playerAttackBounds;
@@ -121,11 +144,20 @@ public class Level {
 			
 	}
 	
-	public void mousePressed(int mouseBtn) {
-		if(mouseBtn == MouseEvent.BUTTON1) //left click
+	public void mousePressed(int mouseBtn, int x, int y) {
+		//left click
+		if(mouseBtn == MouseEvent.BUTTON1) {
+//			System.out.println("Left Click!");
 			p.attack();
-//		if(mouseBtn == MouseEvent.BUTTON3) //right click
-//			p.attack2();
+			}
+		//right click
+		if(mouseBtn == MouseEvent.BUTTON3) {
+//			System.out.println("Right Click!");
+			Vector2i point = game.windowToBufferPoint(new Vector2i(x,y));
+//			p.throwSpear(x, y);
+			p.throwSpear(point);
+		}
+			
 	}
 	
 	public void mouseReleased(int mouseBtn) {
@@ -146,6 +178,10 @@ public class Level {
 			npcs.add(king);
 			break;
 		}
+	}
+	
+	public void addProjectile(Projectile proj) {
+		projs.add(proj);
 	}
 	
 	public static void setMap(int[][] wmap) {
@@ -179,8 +215,14 @@ public class Level {
 	}
 	
 	public void damagePlayer(Rectangle bounds, int damage) {
-		if(bounds.intersects(p.getBounds()))
+		if(bounds.intersects(p.getBounds())) {
 			p.damage(damage);
+			Vector2i boundsCenter = new Vector2i(bounds.x + bounds.width / 2, bounds.y + bounds.height);
+			Vector2i dest = new Vector2i();
+			p.centerPos().sub(boundsCenter, dest);
+			p.addForce(dest);
+		}
+			
 	}
 	
 	public double distFromPlayer(Rectangle other) {
@@ -192,10 +234,11 @@ public class Level {
 	}
 	
 	public void interact() {
-		selectedEntity.interact();
+		if(selectedEntity != null)
+			selectedEntity.interact();
 	}
 	
-	public void selectEntity(Entity entity) {
+	public void selectEntity(Interactable entity) {
 		selectedEntity = entity;
 	}
 

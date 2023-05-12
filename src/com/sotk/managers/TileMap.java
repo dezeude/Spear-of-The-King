@@ -128,7 +128,7 @@ public class TileMap {
 							int mobY = Integer.parseInt(obj.getAttribute("y"));
 							Element property = (Element)(object.getChildNodes().item(1).getChildNodes().item(1));
 							String[] extras = property.getTextContent().split("\\r?\\n");
-							System.out.println(Arrays.toString(extras));
+//							System.out.println(Arrays.toString(extras));
 							level.addMob(name, mobX, mobY, extras);
 						}
 						
@@ -171,8 +171,8 @@ public class TileMap {
 	}
 	
 	public void render(Graphics g) {
-			for(int y = Camera.getYOffset() / TILELENGTH; y < (Camera.getYOffset() + GamePanel.getWindowHeight()) / TILELENGTH + 1; y++) {//only render the tiles on the screen
-				for(int x = Camera.getXOffset() / TILELENGTH; x < (Camera.getXOffset() + GamePanel.getWindowWidth()) / TILELENGTH + 1; x++) {
+			for(int y = Camera.getYOffset() / TILELENGTH; y < (Camera.getYOffset() + GamePanel.getGraphicsHeight()) / TILELENGTH + 1; y++) {//only render the tiles on the screen
+				for(int x = Camera.getXOffset() / TILELENGTH; x < (Camera.getXOffset() + GamePanel.getGraphicsWidth()) / TILELENGTH + 1; x++) {
 					for(int i = 0; i < layersData.size(); i++) {
 						if(y >= 0 && y < map.length && x >= 0 && x < map[y].length) {
 							int ID = layersData.get(i)[y][x] - 1;
