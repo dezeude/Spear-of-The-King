@@ -2,8 +2,10 @@ package com.sotk.managers;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.awt.image.VolatileImage;
 
 public class Animation {
+	private VolatileImage testImage; //may use volatile image to get rid of flashing tiles
 	private float index;
 	private float incrementer;
 	BufferedImage[]frames;

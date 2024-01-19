@@ -44,8 +44,8 @@ public class GameState extends State{
 		//render the level
 		curLevel.render(g);
 		
-	}
-
+	}	
+	
 	@Override
 	public void keyPressed(int key) {
 		
@@ -55,8 +55,6 @@ public class GameState extends State{
 	public void keyReleased(int key) {
 		if(key == KeyEvent.VK_SPACE)
 			curLevel.interact();
-		if(key == KeyEvent.VK_S)
-			Launcher.frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 	}
 
 	@Override
@@ -79,5 +77,8 @@ public class GameState extends State{
 			//play End Credits and then change level back to 1
 		}
 	}
+
+
+
 	
 }

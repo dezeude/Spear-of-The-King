@@ -2,7 +2,6 @@ package com.sotk.entities;
 
 import java.awt.Graphics;
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import org.joml.Vector2f;

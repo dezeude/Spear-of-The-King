@@ -18,7 +18,7 @@ public class Camera {
 		divisor = div;
 	}
 	public static void smoothTo(int x, int y) {//TODO: FIX THIS!
-// Smoothly moves the camera to the argument position (x,y) by changing the x and y 
+// Smoothly moves the camera so that the center is the argument position (x,y) by changing the x and y 
 // offsets by the difference of the position and dividing it by the smoothing divisor number.
 
 		xOffset += (x - xOffset - (GamePanel.getGraphicsWidth() / 2))	/ divisor;
