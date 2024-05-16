@@ -1,6 +1,6 @@
 # Spear-of-The-King
 
-This is a small project that I started a while ago, but haven't finished yet because of procrastination and motivational issues. I started this project to understand how games were made from scratch using code without a game engine and with minimal libraries. This project doesn't have any external libraries apart from the base JRE libraries from Java 11. You can run the "SoTK.jar" file in the root directory to see where the game is at right now. (There's not much lol)
+This is a small project that I started a while ago, but haven't finished yet because of procrastination and motivational issues. I started this project to understand how games were made from scratch using code without a game engine and with minimal libraries. This project doesn't have any external libraries apart from the base JRE libraries from Java 11 and [JOML](https://github.com/JOML-CI/JOML). You can run the "SoTK.jar" file in the root directory to see where the game is at right now. (There's not much lol)
 This was a really fun project and I hope I get more motivation to eventually finish it, lol.
 
 ## The Game
